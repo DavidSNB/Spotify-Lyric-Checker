@@ -1,8 +1,11 @@
 import json
 import io
 import os
-# from datetime import datetime
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
+import shutil
 
+Tk().withdraw()
 spotify_directory = "./spotify_data/"
 
 
@@ -36,5 +39,53 @@ def get_song_data():
     # datetime.strptime(string, "%Y-%m-%d %H:%M")
 
 
+def get_spotify_file(fresh=False):
+    file_location = askopenfilename(
+        initialdir="D:/Downloads",
+        title="Select Spotify JSON",
+        filetypes=(("JSON", "*.json"), ("All Files", "*.*")))
+
+    if not fresh:
+        resolved_input = False
+
+        while not resolved_input:
+            remove_old = input(
+                "Do you want to remove pre-existing files? [y/N]\n").lower()
+            if remove_old == "y":
+                for file in os.listdir(spotify_directory):
+                    os.remove(spotify_directory + file)
+                print("Files removed.\n")
+                resolved_input = True
+            elif remove_old == "n" or not remove_old:
+                print("Files not removed.\n")
+                resolved_input = True
+            else:
+                print("Unknown Input\n")
+
+    resolved_input = False
+
+    while not resolved_input:
+        copy_or_move = input(
+            "Do you want to copy or move the selected file? [C/m]\n").lower()
+        if copy_or_move == "c" or not copy_or_move:
+            shutil.copy(file_location, spotify_directory)
+            print("Files Copied.\n")
+            resolved_input = True
+        elif copy_or_move == "m":
+            shutil.move(file_location, spotify_directory)
+            print("Files Moved.\n")
+            resolved_input = True
+        else:
+            print("Unknown Input\n")
+
+
+def data_present():
+    if not os.listdir(spotify_directory):
+        return False
+    else:
+        return True
+
+
 if __name__ == "__main__":
-    print(get_song_data())
+    print(get_spotify_file())
+    # print(get_song_data())
